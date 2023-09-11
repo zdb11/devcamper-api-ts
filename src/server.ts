@@ -5,7 +5,7 @@ import config from './config/config.js';
 import { connectDB } from './database/mongo.js';
 
 const app: Express = express();
-
+app.use(express.json());
 if (config.NODE_ENV === 'development') {
     app.use(morgan('dev'));
 }
