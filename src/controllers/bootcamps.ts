@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import { BootcampModel } from '../models/Bootcamp.js';
+import { ErrorResponse } from '../utils/errorResponse.js';
 
 // @desc        Get all bootcamps
 // @route       GET /api/v1/bootcamps
@@ -10,7 +11,7 @@ export const getBootcamps = async (req: Request, res: Response, next: NextFuncti
         res.status(200).json({ success: true, count: bootcamps.length, data: bootcamps });
     } catch (error) {
         console.log(`Error from GET /api/v1/bootcamps :${error}`);
-        res.status(400).json({ success: false });
+        next(error);
     }
 };
 
@@ -21,12 +22,12 @@ export const getBootcamp = async (req: Request, res: Response, next: NextFunctio
     try {
         const bootcamp = await BootcampModel.findById(req.params.id);
         if (!bootcamp) {
-            return res.status(400).json({ success: false });
+            return next(new ErrorResponse(`Bootcamp not found with id of ${req.params.id}`, 404));
         }
         res.status(200).json({ success: true, data: bootcamp });
     } catch (error) {
         console.log(`Error from GET /api/v1/bootcamps/:id :${error}`);
-        res.status(400).json({ success: false });
+        next(error);
     }
 };
 
@@ -39,7 +40,7 @@ export const createBootcamp = async (req: Request, res: Response, next: NextFunc
         res.status(201).json({ success: true, data: bootcamp });
     } catch (error) {
         console.log(`Error from POST /api/v1/bootcamps :${error}`);
-        res.status(400).json({ success: false });
+        next(error);
     }
 };
 
@@ -53,12 +54,12 @@ export const updateBootcamp = async (req: Request, res: Response, next: NextFunc
             runValidators: true,
         });
         if (!bootcamp) {
-            return res.status(400).json({ success: false });
+            return next(new ErrorResponse(`Bootcamp not found with id of ${req.params.id}`, 404));
         }
         res.status(200).json({ success: true, data: bootcamp });
     } catch (error) {
         console.log(`Error from PUT /api/v1/bootcamps/:id :${error}`);
-        res.status(400).json({ success: false });
+        next(error);
     }
 };
 
@@ -69,11 +70,11 @@ export const deleteBootcamp = async (req: Request, res: Response, next: NextFunc
     try {
         const bootcamp = await BootcampModel.findByIdAndDelete(req.params.id);
         if (!bootcamp) {
-            return res.status(400).json({ success: false });
+            return next(new ErrorResponse(`Bootcamp not found with id of ${req.params.id}`, 404));
         }
         res.status(200).json({ success: true, data: {} });
     } catch (error) {
         console.log(`Error from DELETE /api/v1/bootcamps/:id :${error}`);
-        res.status(400).json({ success: false });
+        next(error);
     }
 };
