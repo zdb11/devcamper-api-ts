@@ -6,19 +6,25 @@ interface ENV {
     NODE_ENV: string | undefined;
     PORT: string | undefined;
     MONGO_URI: string | undefined;
+    GEOCODER_PROVIDER: string | undefined;
+    GEOCODER_API_KEY: string | undefined;
 }
 
 interface Config {
     NODE_ENV: string;
     PORT: string;
     MONGO_URI: string;
+    GEOCODER_PROVIDER: string;
+    GEOCODER_API_KEY: string;
 }
 
 const getConfig = (): ENV => {
     return {
         NODE_ENV: process.env.NODE_ENV,
         PORT: process.env.PORT,
-        MONGO_URI: process.env.MONGO_URI
+        MONGO_URI: process.env.MONGO_URI,
+        GEOCODER_PROVIDER: process.env.GEOCODER_PROVIDER,
+        GEOCODER_API_KEY: process.env.GEOCODER_API_KEY,
     };
 };
 

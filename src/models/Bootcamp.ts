@@ -1,4 +1,6 @@
 import mongoose, { Schema, InferSchemaType } from 'mongoose';
+import slugify from 'slugify';
+import { geocoder } from '../utils/geocoder.js';
 
 const BootcampSchema = new Schema({
     name: {
@@ -84,5 +86,23 @@ const BootcampSchema = new Schema({
         default: Date.now,
     },
 });
+
 type Bootcamp = InferSchemaType<typeof BootcampSchema>;
+// Create bootcamp slug from the name
+BootcampSchema.pre('save', function (next) {
+    this.slug = slugify.default(this.name, { lower: true });
+    next();
+});
+
+// Geocode & create location field
+BootcampSchema.pre('save', async function (this: any, next) {
+    // TO DO
+    const loc = await geocoder.geocode(this.address);
+    this.location = {
+        type: 'Point',
+        coordinates: [loc[0].longitude, loc[0].latitude]
+        
+    }
+    next();
+});
 export const BootcampModel = mongoose.model('Bootcamp', BootcampSchema);
