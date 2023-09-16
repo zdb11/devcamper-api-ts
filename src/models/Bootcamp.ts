@@ -95,14 +95,19 @@ BootcampSchema.pre('save', function (next) {
 });
 
 // Geocode & create location field
-BootcampSchema.pre('save', async function (this: any, next) {
-    // TO DO
+BootcampSchema.pre('save', async function (next) {
     const loc = await geocoder.geocode(this.address);
-    this.location = {
+    this.set('location', {
         type: 'Point',
-        coordinates: [loc[0].longitude, loc[0].latitude]
-        
-    }
+        coordinates: [loc[0].longitude, loc[0].latitude],
+        formattedAddress: loc[0].formattedAddress,
+        street: loc[0].streetName,
+        city: loc[0].city,
+        state: loc[0].state,
+        zipcode: loc[0].zipcode,
+        country: loc[0].country
+    });
+    this.set('address', undefined);
     next();
 });
 export const BootcampModel = mongoose.model('Bootcamp', BootcampSchema);
