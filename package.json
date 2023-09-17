@@ -9,7 +9,8 @@
     "prestart": "npx tsc",
     "start": "node build/server",
     "dev": "concurrently \"npx tsc --watch\" \"nodemon build/server\"",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "seeder": "node build/seeder"
   },
   "author": "",
   "license": "ISC",
