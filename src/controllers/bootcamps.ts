@@ -1,41 +1,41 @@
-import type { Request, Response, NextFunction } from 'express';
-import { BootcampModel } from '../models/Bootcamp.js';
-import { ErrorResponse } from '../utils/errorResponse.js';
-import { asyncHandler } from '../middleware/async.js';
-import { geocoder } from '../utils/geocoder.js';
+import type { Request, Response, NextFunction } from "express";
+import { BootcampModel } from "../models/Bootcamp.js";
+import { ErrorResponse } from "../utils/errorResponse.js";
+import { asyncHandler } from "../middleware/async.js";
+import { geocoder } from "../utils/geocoder.js";
 
 // @desc        Get all bootcamps
 // @route       GET /api/v1/bootcamps
 // @access      Public
-export const getBootcamps = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+export const getBootcamps = asyncHandler(async (req: Request, res: Response) => {
     const reqQuery = { ...req.query };
 
     // Special keywords
-    const removeFields = ['select', 'sort', 'page', 'limit'];
+    const removeFields = ["select", "sort", "page", "limit"];
     removeFields.forEach((field) => delete reqQuery[field]);
 
     // Query regex
     const queryString = JSON.stringify(reqQuery).replace(/\b(gt|gte|lt|lte|in")\b/g, (match) => `$${match}`);
 
-    let query = BootcampModel.find(JSON.parse(queryString));
+    const query = BootcampModel.find(JSON.parse(queryString));
 
-    // Select 
+    // Select
     if (req.query.select) {
-        const fields = (req.query.select as string).split(',').join(' ');
+        const fields = (req.query.select as string).split(",").join(" ");
         query.select(fields);
     }
 
     // Sort
     if (req.query.sort) {
-        const sortBy = (req.query.sort as string).split(',').join(' ');
+        const sortBy = (req.query.sort as string).split(",").join(" ");
         query.sort(sortBy);
     } else {
-        query.sort('-createdAt');
+        query.sort("-createdAt");
     }
 
     // Paginiation
-    const page = parseInt((req.query.page as string), 10) || 1;
-    const limit = parseInt((req.query.limit as string), 10) || 25;
+    const page = parseInt(req.query.page as string, 10) || 1;
+    const limit = parseInt(req.query.limit as string, 10) || 25;
     const startIndex = (page - 1) * limit;
     const endIndex = page * limit;
     const total = await BootcampModel.countDocuments();
@@ -43,18 +43,18 @@ export const getBootcamps = asyncHandler(async (req: Request, res: Response, nex
     query.skip(startIndex).limit(limit);
 
     // Pagination result
-    const pagination = {next: {}, prev: {}};
+    const pagination = { next: {}, prev: {} };
     if (endIndex < total) {
         pagination.next = {
             page: page + 1,
-            limit: limit
-        }
+            limit: limit,
+        };
     }
     if (startIndex > 0) {
         pagination.prev = {
             page: page - 1,
-            limit: limit
-        }
+            limit: limit,
+        };
     }
 
     // Executing query
@@ -76,7 +76,7 @@ export const getBootcamp = asyncHandler(async (req: Request, res: Response, next
 // @desc        Create new bootcamp
 // @route       POST /api/v1/bootcamps
 // @access      Private
-export const createBootcamp = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+export const createBootcamp = asyncHandler(async (req: Request, res: Response) => {
     const bootcamp = await BootcampModel.create(req.body);
     res.status(201).json({ success: true, data: bootcamp });
 });
@@ -109,7 +109,7 @@ export const deleteBootcamp = asyncHandler(async (req: Request, res: Response, n
 // @desc        Get bootcamps within a radius
 // @route       GET /api/v1/bootcamps/radius/:zipcode/:distance
 // @access      Private
-export const getBootcampsInRadius = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+export const getBootcampsInRadius = asyncHandler(async (req: Request, res: Response) => {
     const { zipcode, distance } = req.params;
     const loc = await geocoder.geocode(zipcode);
     const lat = loc[0].latitude;
