@@ -8,7 +8,27 @@ import { geocoder } from '../utils/geocoder.js';
 // @route       GET /api/v1/bootcamps
 // @access      Public
 export const getBootcamps = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const bootcamps = await BootcampModel.find();
+    const reqQuery = { ...req.query };
+
+    const removeFields = ['select', 'sort'];
+    removeFields.forEach((field) => delete reqQuery[field]);
+
+    const queryString = JSON.stringify(reqQuery).replace(/\b(gt|gte|lt|lte|in")\b/g, (match) => `$${match}`);
+
+    let query = BootcampModel.find(JSON.parse(queryString));
+
+    if (req.query.select) {
+        const fields = (req.query.select as string).split(',').join(' ');
+        query.select(fields);
+    }
+
+    if (req.query.sort) {
+        const sortBy = (req.query.sort as string).split(',').join(' ');
+        query.sort(sortBy);
+    } else {
+        query.sort('-createdAt');
+    }
+    const bootcamps = await query;
     res.status(200).json({ success: true, count: bootcamps.length, data: bootcamps });
 });
 
@@ -56,7 +76,6 @@ export const deleteBootcamp = asyncHandler(async (req: Request, res: Response, n
     res.status(200).json({ success: true, data: {} });
 });
 
-
 // @desc        Get bootcamps within a radius
 // @route       GET /api/v1/bootcamps/radius/:zipcode/:distance
 // @access      Private
@@ -70,14 +89,13 @@ export const getBootcampsInRadius = asyncHandler(async (req: Request, res: Respo
     const bootcamps = await BootcampModel.find({
         location: {
             $geoWithin: {
-                $centerSphere: [[lng, lat], radius]
-            }
-        }
-    })
+                $centerSphere: [[lng, lat], radius],
+            },
+        },
+    });
     res.status(200).json({
         success: true,
         count: bootcamps.length,
-        data: bootcamps
-    })
+        data: bootcamps,
+    });
 });
-

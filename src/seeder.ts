@@ -9,16 +9,18 @@ const bootcamps = JSON.parse(fs.readFileSync(`${__dirname}\\..\\_data\\bootcamps
 await connectDB();
 
 if (process.argv[2] === '-i') {
-    importData();
+    await importData();
 } else if (process.argv[2] === '-d') {
-    deleteData();
+    await deleteData();
+} else {
+    console.log("Choose option");
 }
+process.exit();
 
 async function importData() {
     try {
         await BootcampModel.create(bootcamps);
         console.log('Data Imported');
-        process.exit();
     } catch (error) {
         console.log(`Error when creating bootcamps ${error}`);
     }
@@ -28,7 +30,6 @@ async function deleteData() {
     try {
         await BootcampModel.deleteMany();
         console.log('Data deleted');
-        process.exit();
     } catch (error) {
         console.log(`Error when deleting data ${error}`);
     }
