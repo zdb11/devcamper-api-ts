@@ -64,9 +64,10 @@ export const updateCourse = asyncHandler(async (req: Request, res: Response, nex
 // @route       DELETE /api/v1/courses/:id
 // @access      Private
 export const deleteCourse = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const course = await CourseModel.deleteOne({ _id: req.params.id });
+    const course = await CourseModel.findOne({ _id: req.params.id });
     if (!course) {
         return next(new ErrorResponse(`No course find with id ${req.params.id}`, 404));
     }
+    await course.deleteOne();
     res.status(200).json({ success: true, data: {} });
 });

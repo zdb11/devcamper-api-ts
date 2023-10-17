@@ -41,9 +41,9 @@ const CourseSchema = new Schema(
     },
     {
         statics: {
-            async getAverageCost(bootcampId) {
+            async getAverageCost(bootcampId: mongoose.Types.ObjectId) {
                 console.log("Calculating avg cost..");
-                const obj = await this.aggregate([
+                const aggregate = await this.aggregate([
                     {
                         $match: {
                             bootcamp: bootcampId,
@@ -58,9 +58,10 @@ const CourseSchema = new Schema(
                         },
                     },
                 ]);
+                const averageCost = aggregate[0]?.averageCost ?? 0;
                 try {
                     await BootcampModel.findByIdAndUpdate(bootcampId, {
-                        averageCost: Math.ceil(obj[0].averageCost / 10) * 10,
+                        averageCost: Number(averageCost).toFixed(2),
                     });
                 } catch (error) {
                     console.log(`Error when updating bootcamp with average cost ${error}`);
@@ -72,6 +73,13 @@ const CourseSchema = new Schema(
 
 // Call getAverageCost after save
 CourseSchema.post("save", function () {
+    // Can't find any other workaround than just ts-ignore
+    // @ts-ignore
+    this.constructor.getAverageCost(this.bootcamp);
+});
+
+// Call getAverageCost after deleteOne
+CourseSchema.pre("deleteOne", { document: true }, function () {
     // Can't find any other workaround than just ts-ignore
     // @ts-ignore
     this.constructor.getAverageCost(this.bootcamp);
