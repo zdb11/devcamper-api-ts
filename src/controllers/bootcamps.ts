@@ -3,6 +3,9 @@ import { BootcampModel } from "../models/Bootcamp.js";
 import { ErrorResponse } from "../utils/errorResponse.js";
 import { asyncHandler } from "../middleware/async.js";
 import { geocoder } from "../utils/geocoder.js";
+import { UploadedFile } from "express-fileupload";
+import sanitizedConfig from "../config/config.js";
+import path from "path";
 
 // @desc        Get all bootcamps
 // @route       GET /api/v1/bootcamps
@@ -127,5 +130,44 @@ export const getBootcampsInRadius = asyncHandler(async (req: Request, res: Respo
         success: true,
         count: bootcamps.length,
         data: bootcamps,
+    });
+});
+
+// @desc        Upload photo for bootcamp
+// @route       PUT /api/v1/bootcamps/:id/photo
+// @access      Private
+export const uploadBootcampUpload = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const bootcamp = await BootcampModel.findById(req.params.id);
+    if (!bootcamp) {
+        return next(new ErrorResponse(`Bootcamp not found with id of ${req.params.id}`, 404));
+    }
+
+    if (!req.files) {
+        return next(new ErrorResponse(`Please upload a file`, 400));
+    }
+
+    const file = req.files.file as UploadedFile;
+
+    // Check if file is image
+    if (!file.mimetype.startsWith("image")) {
+        return next(new ErrorResponse(`Please upload an image file`, 400));
+    }
+
+    // Check file size
+    if (file.size > sanitizedConfig.MAX_FILE_UPLOAD) {
+        return next(new ErrorResponse(`Please upload an image less than ${sanitizedConfig.MAX_FILE_UPLOAD}`, 400));
+    }
+
+    // Create custom filename
+    file.name = `photo_${bootcamp.id}${path.parse(file.name).ext}`;
+
+    // Save image file to server
+    file.mv(`${sanitizedConfig.FILE_UPLOAD_PATH}/${file.name}`, async (err) => {
+        if (err) {
+            console.error(err);
+            return next(new ErrorResponse("Problem with file upload", 500));
+        }
+        await BootcampModel.findByIdAndUpdate(req.params.id, { photo: file.name });
+        res.status(200).json({ success: true, data: file.name });
     });
 });

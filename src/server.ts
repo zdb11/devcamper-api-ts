@@ -5,16 +5,33 @@ import morgan from "morgan";
 import config from "./config/config.js";
 import { connectDB } from "./database/mongo.js";
 import { errorHandler } from "./middleware/error.js";
-
+import fileupload from "express-fileupload";
+import path from "path";
+import * as url from "url";
+const __dirname = url.fileURLToPath(new URL(".", import.meta.url));
 const app: Express = express();
+
+// Body parser
 app.use(express.json());
+
+// Dev logging middleware
 if (config.NODE_ENV === "development") {
     app.use(morgan("dev"));
 }
 
+// File uploading
+app.use(fileupload());
+
+// Set static folder
+app.use(express.static(path.join(__dirname, "..", "public")));
+
+// Mount routers
 app.use("/api/v1/bootcamps", bootcampRouter);
 app.use("/api/v1/courses", coursesRouter);
+
+// Error handling middleware
 app.use(errorHandler);
+
 try {
     console.log("Preparing database connection.");
     await connectDB();

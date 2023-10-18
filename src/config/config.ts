@@ -1,4 +1,4 @@
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 
 dotenv.config();
 
@@ -8,6 +8,8 @@ interface ENV {
     MONGO_URI: string | undefined;
     GEOCODER_PROVIDER: string | undefined;
     GEOCODER_API_KEY: string | undefined;
+    FILE_UPLOAD_PATH: string | undefined;
+    MAX_FILE_UPLOAD: number | undefined;
 }
 
 interface Config {
@@ -16,6 +18,8 @@ interface Config {
     MONGO_URI: string;
     GEOCODER_PROVIDER: string;
     GEOCODER_API_KEY: string;
+    FILE_UPLOAD_PATH: string;
+    MAX_FILE_UPLOAD: number;
 }
 
 const getConfig = (): ENV => {
@@ -25,6 +29,8 @@ const getConfig = (): ENV => {
         MONGO_URI: process.env.MONGO_URI,
         GEOCODER_PROVIDER: process.env.GEOCODER_PROVIDER,
         GEOCODER_API_KEY: process.env.GEOCODER_API_KEY,
+        FILE_UPLOAD_PATH: process.env.FILE_UPLOAD_PATH,
+        MAX_FILE_UPLOAD: Number(process.env.MAX_FILE_UPLOAD),
     };
 };
 
