@@ -10,6 +10,8 @@ interface ENV {
     GEOCODER_API_KEY: string | undefined;
     FILE_UPLOAD_PATH: string | undefined;
     MAX_FILE_UPLOAD: number | undefined;
+    JWT_SECRET: string | undefined;
+    JWT_EXPIRE: string | undefined;
 }
 
 interface Config {
@@ -20,6 +22,8 @@ interface Config {
     GEOCODER_API_KEY: string;
     FILE_UPLOAD_PATH: string;
     MAX_FILE_UPLOAD: number;
+    JWT_SECRET: string;
+    JWT_EXPIRE: string;
 }
 
 const getConfig = (): ENV => {
@@ -31,6 +35,8 @@ const getConfig = (): ENV => {
         GEOCODER_API_KEY: process.env.GEOCODER_API_KEY,
         FILE_UPLOAD_PATH: process.env.FILE_UPLOAD_PATH,
         MAX_FILE_UPLOAD: Number(process.env.MAX_FILE_UPLOAD),
+        JWT_SECRET: process.env.JWT_SECRET,
+        JWT_EXPIRE: process.env.JWT_EXPIRE,
     };
 };
 

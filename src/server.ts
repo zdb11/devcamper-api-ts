@@ -1,6 +1,7 @@
 import express, { type Express } from "express";
 import { bootcampRouter } from "./routes/bootcamps.js";
 import { coursesRouter } from "./routes/courses.js";
+import { authRouter } from "./routes/auth.js";
 import morgan from "morgan";
 import config from "./config/config.js";
 import { connectDB } from "./database/mongo.js";
@@ -28,6 +29,7 @@ app.use(express.static(path.join(__dirname, "..", "public")));
 // Mount routers
 app.use("/api/v1/bootcamps", bootcampRouter);
 app.use("/api/v1/courses", coursesRouter);
+app.use("/api/v1/auth", authRouter);
 
 // Error handling middleware
 app.use(errorHandler);
