@@ -51,6 +51,9 @@ const UserSchema = new Schema(
                     expiresIn: sanitizedConfig.JWT_EXPIRE,
                 });
             },
+            async matchPassword(enteredPassword: string) {
+                return await bcryptjs.compare(enteredPassword, this.password);
+            },
         },
     }
 );
