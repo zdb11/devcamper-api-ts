@@ -12,6 +12,7 @@ interface ENV {
     MAX_FILE_UPLOAD: number | undefined;
     JWT_SECRET: string | undefined;
     JWT_EXPIRE: string | undefined;
+    JWT_COOKIE_EXPIRE: number | undefined;
 }
 
 interface Config {
@@ -24,6 +25,7 @@ interface Config {
     MAX_FILE_UPLOAD: number;
     JWT_SECRET: string;
     JWT_EXPIRE: string;
+    JWT_COOKIE_EXPIRE: number;
 }
 
 const getConfig = (): ENV => {
@@ -37,6 +39,7 @@ const getConfig = (): ENV => {
         MAX_FILE_UPLOAD: Number(process.env.MAX_FILE_UPLOAD),
         JWT_SECRET: process.env.JWT_SECRET,
         JWT_EXPIRE: process.env.JWT_EXPIRE,
+        JWT_COOKIE_EXPIRE: Number(process.env.JWT_COOKIE_EXPIRE),
     };
 };
 

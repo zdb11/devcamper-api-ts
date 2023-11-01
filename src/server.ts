@@ -7,6 +7,7 @@ import config from "./config/config.js";
 import { connectDB } from "./database/mongo.js";
 import { errorHandler } from "./middleware/error.js";
 import fileupload from "express-fileupload";
+import cookieParser from "cookie-parser";
 import path from "path";
 import * as url from "url";
 const __dirname = url.fileURLToPath(new URL(".", import.meta.url));
@@ -14,6 +15,9 @@ const app: Express = express();
 
 // Body parser
 app.use(express.json());
+
+// Cookie parser
+app.use(cookieParser());
 
 // Dev logging middleware
 if (config.NODE_ENV === "development") {
