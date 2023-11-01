@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import sanitizedConfig from "../config/config.js";
 
 interface IUser {
+    _id: Schema.Types.ObjectId;
     name: string;
     email: string;
     role: string;

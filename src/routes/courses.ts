@@ -3,6 +3,7 @@ import { getCourses, getCourse, addCourse, updateCourse, deleteCourse } from "..
 import { CourseModel } from "../models/Course.js";
 import { advancedResult } from "../middleware/advancedResult.js";
 import { PopulateOptions } from "mongoose";
+import { protect } from "../middleware/auth.js";
 export const coursesRouter: Router = express.Router({ mergeParams: true });
 
 const getCoursesPopulteOpt: PopulateOptions = {
@@ -10,5 +11,5 @@ const getCoursesPopulteOpt: PopulateOptions = {
     select: "name description",
 };
 
-coursesRouter.route("/").get(advancedResult(CourseModel, getCoursesPopulteOpt), getCourses).post(addCourse);
-coursesRouter.route("/:id").get(getCourse).put(updateCourse).delete(deleteCourse);
+coursesRouter.route("/").get(advancedResult(CourseModel, getCoursesPopulteOpt), getCourses).post(protect, addCourse);
+coursesRouter.route("/:id").get(getCourse).put(protect, updateCourse).delete(protect, deleteCourse);

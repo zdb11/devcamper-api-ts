@@ -1,6 +1,6 @@
 export interface Result {
     success: boolean;
-    count: number;
+    count?: number;
     data: object;
 }
 export interface PaginationInfo {

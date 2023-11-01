@@ -3,6 +3,7 @@ import { asyncHandler } from "../middleware/async.js";
 import { CookieOptions, NextFunction, Request, Response } from "express";
 import { ErrorResponse } from "../utils/errorResponse.js";
 import sanitizedConfig from "../config/config.js";
+import { Result } from "../interfaces/interfaces.js";
 // @desc        Register user
 // @route       POST /api/v1/auth/register
 // @access      Public
@@ -62,3 +63,18 @@ const sendTokenResponse = (user: IUserDocument, statusCode: number, res: Respons
     }
     res.status(statusCode).cookie("token", token, options).json({ success: true, token });
 };
+
+// @desc        Get current logged in user
+// @route       POST /api/v1/auth/me
+// @access      Private
+export const getMe = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const user: IUserDocument | null = await UserModel.findById(req.user?._id);
+    if (user === null) {
+        next(new ErrorResponse("No user found for this header value", 404));
+    }
+    const result: Result = {
+        success: true,
+        data: user as object,
+    };
+    res.status(200).json(result);
+});
