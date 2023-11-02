@@ -4,4 +4,4 @@ import { protect } from "../middleware/auth.js";
 export const authRouter = express.Router();
 authRouter.post("/register", registerUser);
 authRouter.post("/login", loginUser);
-authRouter.post("/me", protect, getMe);
+authRouter.get("/me", protect, getMe);

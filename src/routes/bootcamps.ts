@@ -11,15 +11,19 @@ import {
 import { getCourses } from "../controllers/courses.js";
 import { BootcampModel } from "../models/Bootcamp.js";
 import { advancedResult } from "../middleware/advancedResult.js";
-import { protect } from "../middleware/auth.js";
+import { protect, authorize } from "../middleware/auth.js";
 
 export const bootcampRouter: Router = express.Router();
 
 bootcampRouter
     .route("/")
     .get(advancedResult(BootcampModel, ["courses"]), getBootcamps)
-    .post(protect, createBootcamp);
-bootcampRouter.route("/:id").get(getBootcamp).put(protect, updateBootcamp).delete(protect, deleteBootcamp);
+    .post(protect, authorize(["publisher", "admin"]), createBootcamp);
+bootcampRouter
+    .route("/:id")
+    .get(getBootcamp)
+    .put(protect, authorize(["publisher", "admin"]), updateBootcamp)
+    .delete(protect, authorize(["publisher", "admin"]), deleteBootcamp);
 bootcampRouter.route("/:id/courses").get(getCourses);
-bootcampRouter.route("/:id/photo").put(protect, uploadBootcampUpload);
+bootcampRouter.route("/:id/photo").put(protect, authorize(["publisher", "admin"]), uploadBootcampUpload);
 bootcampRouter.route("/radius/:zipcode/:distance").get(getBootcampsInRadius);
