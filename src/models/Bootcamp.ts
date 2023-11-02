@@ -89,6 +89,11 @@ const BootcampSchema = new Schema(
             type: Date,
             default: Date.now,
         },
+        user: {
+            type: mongoose.Schema.ObjectId,
+            ref: "User",
+            require: true,
+        },
     },
     {
         toJSON: {
