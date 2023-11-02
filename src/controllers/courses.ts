@@ -35,11 +35,23 @@ export const getCourse = asyncHandler(async (req: Request, res: Response, next: 
 // @access      Private
 export const addCourse = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     req.body.bootcamp = req.params.id;
+    req.body.user = req.user?._id;
 
     const bootcamp = await BootcampModel.findById(req.params.id);
     if (!bootcamp) {
         return next(new ErrorResponse(`No bootcamp find with id ${req.params.id}`, 404));
     }
+
+    // Make sure user is bootcamp owner
+    if (bootcamp.user?._id.toString() !== req.user?._id.toString() && req.user?.role !== "admin") {
+        return next(
+            new ErrorResponse(
+                `User '${req.user?._id}' is not authorized to add this course to bootcamp '${bootcamp._id}'`,
+                401
+            )
+        );
+    }
+
     const course = await CourseModel.create(req.body);
     res.status(200).json({ success: true, data: course });
 });
@@ -51,6 +63,11 @@ export const updateCourse = asyncHandler(async (req: Request, res: Response, nex
     let course = await CourseModel.findById(req.params.id);
     if (!course) {
         return next(new ErrorResponse(`No course find with id ${req.params.id}`, 404));
+    }
+
+    // Make sure user is course owner
+    if (course.user?._id.toString() !== req.user?._id.toString() && req.user?.role !== "admin") {
+        return next(new ErrorResponse(`User '${req.user?._id}' is not authorized to update this course`, 401));
     }
 
     course = await CourseModel.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
@@ -65,6 +82,12 @@ export const deleteCourse = asyncHandler(async (req: Request, res: Response, nex
     if (!course) {
         return next(new ErrorResponse(`No course find with id ${req.params.id}`, 404));
     }
+
+    // Make sure user is course owner
+    if (course.user?._id.toString() !== req.user?._id.toString() && req.user?.role !== "admin") {
+        return next(new ErrorResponse(`User '${req.user?._id}' is not authorized to delete this course`, 401));
+    }
+
     await course.deleteOne();
     res.status(200).json({ success: true, data: {} });
 });

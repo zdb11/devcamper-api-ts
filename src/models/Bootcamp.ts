@@ -129,7 +129,7 @@ BootcampSchema.pre("save", async function (next) {
 });
 
 // Cascade delete courses when bootcamp is deleted
-BootcampSchema.pre("findOneAndDelete", async function (next) {
+BootcampSchema.pre("deleteOne", async function (next) {
     const query = this.getQuery();
     console.log(`Courses begin to be deleted from bootcamp ${query._id}`);
     await CourseModel.deleteMany({ bootcamp: query._id });
