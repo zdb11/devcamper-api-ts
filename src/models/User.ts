@@ -1,16 +1,17 @@
-import mongoose, { Model, Schema } from "mongoose";
+import mongoose, { Document, Model, Schema } from "mongoose";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
 import sanitizedConfig from "../config/config.js";
+import crypto from "crypto";
 
-interface IUser {
+interface IUser extends Document {
     _id: Schema.Types.ObjectId;
     name: string;
     email: string;
     role: string;
     password: string;
-    resetPasswordToken: string;
-    resetPasswordExpire: Date;
+    resetPasswordToken: string | undefined;
+    resetPasswordExpire: Date | undefined;
     confirmEmailToken: string;
     isEmailConfirmed: boolean;
     twoFactorCode: string;
@@ -21,6 +22,7 @@ interface IUser {
 interface IUserMethods {
     getSignedJwtToken(): string;
     matchPassword(enteredPassword: string): Promise<boolean>;
+    getResetPasswordToken(): string;
 }
 
 // eslint-disable-next-line no-use-before-define
@@ -68,7 +70,7 @@ const UserSchema = new Schema<IUser, TUserModel, IUserMethods>({
         default: Date.now,
     },
 });
-UserSchema.method("getSignedJwtToken", function () {
+UserSchema.method("getSignedJwtToken", function (): string {
     return jwt.sign({ id: this._id }, sanitizedConfig.JWT_SECRET, {
         expiresIn: sanitizedConfig.JWT_EXPIRE,
     });
@@ -76,7 +78,21 @@ UserSchema.method("getSignedJwtToken", function () {
 UserSchema.method("matchPassword", async function (enteredPassword: string) {
     return await bcryptjs.compare(enteredPassword, this.password);
 });
-UserSchema.pre("save", async function () {
+UserSchema.method("getResetPasswordToken", function (): string {
+    // Generate token
+    const resetToken: string = crypto.randomBytes(20).toString("hex");
+
+    // Hash token set to resetPasswordToken field
+    this.resetPasswordToken = crypto.createHash("sha256").update(resetToken).digest("hex");
+
+    // Set expire
+    this.resetPasswordExpire = Date.now() + 10 * 60 * 1000; // 10 minutes
+    return resetToken;
+});
+UserSchema.pre("save", async function (next: (err?: Error) => void): Promise<void> {
+    if (!this.isModified("password")) {
+        next();
+    }
     const salt = await bcryptjs.genSalt(10);
     this.password = await bcryptjs.hash(this.password, salt);
 });

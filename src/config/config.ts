@@ -13,6 +13,12 @@ interface ENV {
     JWT_SECRET: string | undefined;
     JWT_EXPIRE: string | undefined;
     JWT_COOKIE_EXPIRE: number | undefined;
+    SMTP_HOST: string | undefined;
+    SMTP_PORT: number | undefined;
+    SMTP_EMAIL: string | undefined;
+    SMTP_PASSWORD: string | undefined;
+    FROM_EMAIL: string | undefined;
+    FROM_NAME: string | undefined;
 }
 
 interface Config {
@@ -26,6 +32,12 @@ interface Config {
     JWT_SECRET: string;
     JWT_EXPIRE: string;
     JWT_COOKIE_EXPIRE: number;
+    SMTP_HOST: string;
+    SMTP_PORT: number;
+    SMTP_EMAIL: string;
+    SMTP_PASSWORD: string;
+    FROM_EMAIL: string;
+    FROM_NAME: string;
 }
 
 const getConfig = (): ENV => {
@@ -40,6 +52,12 @@ const getConfig = (): ENV => {
         JWT_SECRET: process.env.JWT_SECRET,
         JWT_EXPIRE: process.env.JWT_EXPIRE,
         JWT_COOKIE_EXPIRE: Number(process.env.JWT_COOKIE_EXPIRE),
+        SMTP_HOST: process.env.SMTP_HOST,
+        SMTP_PORT: Number(process.env.SMTP_PORT),
+        SMTP_EMAIL: process.env.SMTP_EMAIL,
+        SMTP_PASSWORD: process.env.SMTP_PASSWORD,
+        FROM_EMAIL: process.env.FROM_EMAIL,
+        FROM_NAME: process.env.FROM_NAME,
     };
 };
 

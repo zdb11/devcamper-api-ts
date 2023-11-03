@@ -10,6 +10,7 @@ import fileupload from "express-fileupload";
 import cookieParser from "cookie-parser";
 import path from "path";
 import * as url from "url";
+import { EmailManager } from "./utils/EmailManager.js";
 const __dirname = url.fileURLToPath(new URL(".", import.meta.url));
 const app: Express = express();
 
@@ -37,6 +38,9 @@ app.use("/api/v1/auth", authRouter);
 
 // Error handling middleware
 app.use(errorHandler);
+
+// Creating email manager
+export const eManager = new EmailManager();
 
 try {
     console.log("Preparing database connection.");
