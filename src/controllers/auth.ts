@@ -54,7 +54,7 @@ export const loginUser = asyncHandler(async (req: Request, res: Response, next: 
 });
 
 // @desc        Get current logged in user
-// @route       POST /api/v1/auth/me
+// @route       GET /api/v1/auth/me
 // @access      Private
 export const getMe = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const user: IUserDocument | null = await UserModel.findById(req.user?._id);
@@ -128,6 +128,47 @@ export const resetPassword = asyncHandler(async (req: Request, res: Response, ne
     user.password = req.body.password;
     user.resetPasswordToken = undefined;
     user.resetPasswordExpire = undefined;
+    await user.save();
+
+    // Send token
+    sendTokenResponse(user, 200, res);
+});
+
+// @desc        Update user details
+// @route       PUT /api/v1/auth/updatedetials
+// @access      Private
+export const updateUserDetails = asyncHandler(async (req: Request, res: Response) => {
+    const fieldsToUpdates = {
+        name: req.body.name,
+        email: req.body.email,
+    };
+
+    const user: IUserDocument | null = await UserModel.findByIdAndUpdate(req.user?.id, fieldsToUpdates, {
+        new: true,
+        runValidators: true,
+    });
+
+    const result: Result = {
+        success: true,
+        data: user as object,
+    };
+    res.status(200).json(result);
+});
+
+// @desc        Update password
+// @route       PUT /api/v1/auth/updatepassword
+// @access      Private
+export const updatePassword = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const user: IUserDocument | null = await UserModel.findById(req.user?._id)
+        .select("+password")
+        .exec();
+
+    // Check current password
+    if (!(await user?.matchPassword(req.body.currentPassword)) || user === null) {
+        return next(new ErrorResponse("Password is incorrect", 401));
+    }
+
+    user.password = req.body.newPassword;
     await user.save();
 
     // Send token
