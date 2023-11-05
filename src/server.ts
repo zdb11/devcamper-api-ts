@@ -12,6 +12,7 @@ import path from "path";
 import * as url from "url";
 import { EmailManager } from "./utils/EmailManager.js";
 import { userRoutes } from "./routes/users.js";
+import { reviewRouter } from "./routes/review.js";
 const __dirname = url.fileURLToPath(new URL(".", import.meta.url));
 const app: Express = express();
 
@@ -37,6 +38,7 @@ app.use("/api/v1/bootcamps", bootcampRouter);
 app.use("/api/v1/courses", coursesRouter);
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/reviews", reviewRouter);
 
 // Error handling middleware
 app.use(errorHandler);

@@ -5,11 +5,13 @@ import { UserModel } from "./models/User.js";
 import { connectDB } from "./database/mongo.js";
 import path from "path";
 import { fileURLToPath } from "url";
+import { ReviewModel } from "./models/Review.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const bootcamps = JSON.parse(fs.readFileSync(`${__dirname}\\..\\_data\\bootcamps.json`, "utf-8"));
 const courses = JSON.parse(fs.readFileSync(`${__dirname}\\..\\_data\\courses.json`, "utf-8"));
 const users = JSON.parse(fs.readFileSync(`${__dirname}\\..\\_data\\users.json`, "utf-8"));
+const reviews = JSON.parse(fs.readFileSync(`${__dirname}\\..\\_data\\reviews.json`, "utf-8"));
 
 await connectDB();
 
@@ -27,6 +29,7 @@ async function importData() {
         await BootcampModel.create(bootcamps);
         await CourseModel.create(courses);
         await UserModel.create(users);
+        await ReviewModel.create(reviews);
         console.log("Data Imported");
     } catch (error) {
         console.log(`Error when creating models ${error}`);
@@ -38,6 +41,7 @@ async function deleteData() {
         await BootcampModel.deleteMany();
         await CourseModel.deleteMany();
         await UserModel.deleteMany();
+        await ReviewModel.deleteMany();
         console.log("Data deleted");
     } catch (error) {
         console.log(`Error when deleting data ${error}`);
