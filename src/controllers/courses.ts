@@ -31,6 +31,7 @@ export const getCourse = asyncHandler(async (req: Request, res: Response, next: 
 });
 
 // @desc        Add course
+// @route       POST /api/v1/bootcamps/courses
 // @route       POST /api/v1/bootcamps/:bootcampId/courses
 // @access      Private
 export const addCourse = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
