@@ -6,6 +6,8 @@ import sanitizedConfig from "../config/config.js";
 import { Result } from "../interfaces/interfaces.js";
 import { Options } from "nodemailer/lib/mailer/index.js";
 import { eManager } from "../server.js";
+import crypto from "crypto";
+
 // @desc        Register user
 // @route       POST /api/v1/auth/register
 // @access      Public
@@ -81,7 +83,7 @@ export const forgotPassword = asyncHandler(async (req: Request, res: Response, n
     user.save({ validateBeforeSave: false });
 
     // Create reset url
-    const resetUrl: string = `${req.protocol}://${req.get("host")}/api/v1/resetpassword/${resetToken}`;
+    const resetUrl: string = `${req.protocol}://${req.get("host")}/api/v1/auth/resetpassword/${resetToken}`;
 
     const message: string = `You are receiving this email because you (or someone else) has requested the reset of a password. To reset password please open link: \n\n ${resetUrl}`;
     const options: Options = {
@@ -105,6 +107,31 @@ export const forgotPassword = asyncHandler(async (req: Request, res: Response, n
         await user.save({ validateBeforeSave: false });
         return next(new ErrorResponse("Email could not be sent", 500));
     }
+});
+
+// @desc        Reset password
+// @route       GET /api/v1/auth/resetpassword/:resettoken
+// @access      Private
+export const resetPassword = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    // Get hashed token
+    const resetPasswordToken = crypto.createHash("sha256").update(req.params.resettoken).digest("hex");
+
+    const user: IUserDocument | null = await UserModel.findOne({
+        resetPasswordToken,
+        resetPasswordExpire: { $gt: Date.now() },
+    });
+
+    if (user === null) {
+        return next(new ErrorResponse("Invalid token", 400));
+    }
+
+    user.password = req.body.password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+    await user.save();
+
+    // Send token
+    sendTokenResponse(user, 200, res);
 });
 
 // Get token from model, create cookie and send response
