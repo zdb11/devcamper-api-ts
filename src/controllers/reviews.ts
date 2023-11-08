@@ -44,17 +44,43 @@ export const addReview = asyncHandler(async (req: Request, res: Response, next: 
         return next(new ErrorResponse(`No bootcamp find with id ${req.params.id}`, 404));
     }
 
-    // Make sure user is bootcamp owner
-    if (bootcamp.user?._id.toString() !== req.user?._id.toString() && req.user?.role !== "admin") {
-        return next(
-            new ErrorResponse(
-                `User '${req.user?._id}' is not authorized to add this review to bootcamp '${bootcamp._id}'`,
-                401
-            )
-        );
-    }
-
     const review = await ReviewModel.create(req.body);
     const responseData: Result = { success: true, data: review };
     res.status(200).json(responseData);
+});
+
+// @desc        Update review
+// @route       PUT /api/v1/review/:id
+// @access      Private
+export const updateReview = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    let review = await ReviewModel.findById(req.params.id);
+    if (!review) {
+        return next(new ErrorResponse(`No review find with id ${req.params.id}`, 404));
+    }
+
+    // Make sure user is review owner
+    if (review.user.toString() !== req.user?._id.toString() && req.user?.role !== "admin") {
+        return next(new ErrorResponse(`User '${req.user?._id}' is not authorized to update this review`, 401));
+    }
+
+    review = await ReviewModel.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+    res.status(200).json({ success: true, data: review });
+});
+
+// @desc        Delete review
+// @route       DELETE /api/v1/review/:id
+// @access      Private
+export const deleteReview = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const review = await ReviewModel.findOne({ _id: req.params.id });
+    if (!review) {
+        return next(new ErrorResponse(`No review find with id ${req.params.id}`, 404));
+    }
+
+    // Make sure user is review owner
+    if (review.user.toString() !== req.user?._id.toString() && req.user?.role !== "admin") {
+        return next(new ErrorResponse(`User '${req.user?._id}' is not authorized to delete this review`, 401));
+    }
+
+    await review.deleteOne();
+    res.status(200).json({ success: true, data: {} });
 });

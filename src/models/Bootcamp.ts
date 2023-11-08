@@ -1,8 +1,37 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Document, Schema } from "mongoose";
 import slugify from "slugify";
 import { geocoder } from "../utils/geocoder.js";
 import { CourseModel } from "./Course.js";
-const BootcampSchema = new Schema(
+export interface IBootcamp extends Document {
+    name: string;
+    slug: string;
+    description: string;
+    website: string;
+    phone: string;
+    email: string;
+    address: string;
+    location: {
+        type: string;
+        coordinates: number[];
+        formattedAddress: string;
+        street: string;
+        city: string;
+        state: string;
+        zipcode: string;
+        country: string;
+    };
+    careers: string[];
+    averageRating: number;
+    averageCost: number;
+    photo: string;
+    housing: boolean;
+    jobAssistance: boolean;
+    jobGuarantee: boolean;
+    acceptGi: boolean;
+    createdAt: Date;
+    user: Schema.Types.ObjectId;
+}
+const BootcampSchema = new Schema<IBootcamp>(
     {
         name: {
             type: String,
@@ -143,4 +172,4 @@ BootcampSchema.virtual("courses", {
     foreignField: "bootcamp",
     justOne: false,
 });
-export const BootcampModel = mongoose.model("Bootcamp", BootcampSchema);
+export const BootcampModel = mongoose.model<IBootcamp>("Bootcamp", BootcampSchema);

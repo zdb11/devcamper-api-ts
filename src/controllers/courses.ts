@@ -44,7 +44,7 @@ export const addCourse = asyncHandler(async (req: Request, res: Response, next: 
     }
 
     // Make sure user is bootcamp owner
-    if (bootcamp.user?._id.toString() !== req.user?._id.toString() && req.user?.role !== "admin") {
+    if (bootcamp.user.toString() !== req.user?._id.toString() && req.user?.role !== "admin") {
         return next(
             new ErrorResponse(
                 `User '${req.user?._id}' is not authorized to add this course to bootcamp '${bootcamp._id}'`,
@@ -67,7 +67,7 @@ export const updateCourse = asyncHandler(async (req: Request, res: Response, nex
     }
 
     // Make sure user is course owner
-    if (course.user?._id.toString() !== req.user?._id.toString() && req.user?.role !== "admin") {
+    if (course.user.toString() !== req.user?._id.toString() && req.user?.role !== "admin") {
         return next(new ErrorResponse(`User '${req.user?._id}' is not authorized to update this course`, 401));
     }
 
@@ -85,7 +85,7 @@ export const deleteCourse = asyncHandler(async (req: Request, res: Response, nex
     }
 
     // Make sure user is course owner
-    if (course.user?._id.toString() !== req.user?._id.toString() && req.user?.role !== "admin") {
+    if (course.user.toString() !== req.user?._id.toString() && req.user?.role !== "admin") {
         return next(new ErrorResponse(`User '${req.user?._id}' is not authorized to delete this course`, 401));
     }
 

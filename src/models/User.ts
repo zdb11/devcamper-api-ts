@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import sanitizedConfig from "../config/config.js";
 import crypto from "crypto";
 
-interface IUser extends Document {
+export interface IUser extends Document {
     _id: Schema.Types.ObjectId;
     name: string;
     email: string;
@@ -28,9 +28,9 @@ interface IUserMethods {
 // eslint-disable-next-line no-use-before-define
 export interface IUserDocument extends IUser, IUserMethods {}
 
-type TUserModel = Model<IUser, object, IUserMethods>;
+interface IUserModel extends Model<IUser, object, IUserMethods> {}
 
-const UserSchema = new Schema<IUser, TUserModel, IUserMethods>({
+const UserSchema = new Schema<IUser, IUserModel, IUserMethods>({
     name: {
         type: String,
         required: [true, "Please add a name"],
@@ -97,4 +97,4 @@ UserSchema.pre("save", async function (next: (err?: Error) => void): Promise<voi
     this.password = await bcryptjs.hash(this.password, salt);
 });
 
-export const UserModel = mongoose.model<IUser, TUserModel>("User", UserSchema);
+export const UserModel = mongoose.model<IUser, IUserModel>("User", UserSchema);
