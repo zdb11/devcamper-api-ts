@@ -175,6 +175,21 @@ export const updatePassword = asyncHandler(async (req: Request, res: Response, n
     sendTokenResponse(user, 200, res);
 });
 
+// @desc        Log user out / clear cookie
+// @route       GET /api/v1/auth/logout
+// @access      Private
+export const logoutUser = asyncHandler(async (req: Request, res: Response) => {
+    res.cookie("token", "none", {
+        expires: new Date(Date.now() + 10 * 1000),
+        httpOnly: true,
+    });
+    const result: Result = {
+        success: true,
+        data: {},
+    };
+    res.status(200).json(result);
+});
+
 // Get token from model, create cookie and send response
 const sendTokenResponse = (user: IUserDocument, statusCode: number, res: Response) => {
     // Create token
