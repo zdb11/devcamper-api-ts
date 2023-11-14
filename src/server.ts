@@ -1,19 +1,25 @@
 import express, { type Express } from "express";
-import { bootcampRouter } from "./routes/bootcamps.js";
-import { coursesRouter } from "./routes/courses.js";
-import { authRouter } from "./routes/auth.js";
 import morgan from "morgan";
+import path from "path";
+import * as url from "url";
+import cookieParser from "cookie-parser";
+import fileupload from "express-fileupload";
+import ExpressMongoSanitize from "express-mongo-sanitize";
+import helmet from "helmet";
+import ExpressXssSanitizer from "express-xss-sanitizer";
+import rateLimit, { RateLimitRequestHandler } from "express-rate-limit";
+import hpp from "hpp";
+import cors from "cors";
 import config from "./config/config.js";
 import { connectDB } from "./database/mongo.js";
 import { errorHandler } from "./middleware/error.js";
-import fileupload from "express-fileupload";
-import cookieParser from "cookie-parser";
-import path from "path";
-import * as url from "url";
 import { EmailManager } from "./utils/EmailManager.js";
+import { bootcampRouter } from "./routes/bootcamps.js";
+import { coursesRouter } from "./routes/courses.js";
+import { authRouter } from "./routes/auth.js";
 import { userRoutes } from "./routes/users.js";
 import { reviewRouter } from "./routes/review.js";
-const __dirname = url.fileURLToPath(new URL(".", import.meta.url));
+const __dirname: string = url.fileURLToPath(new URL(".", import.meta.url));
 const app: Express = express();
 
 // Body parser
@@ -30,6 +36,28 @@ if (config.NODE_ENV === "development") {
 // File uploading
 app.use(fileupload());
 
+// Sanitize data
+app.use(ExpressMongoSanitize());
+
+// Set security headers
+app.use(helmet());
+
+// Prevent XSS attacks
+app.use(ExpressXssSanitizer.xss());
+
+// Rate limiting
+const limiter: RateLimitRequestHandler = rateLimit({
+    windowMs: 10 * 60 * 1000, // 10 mins
+    limit: 100,
+});
+app.use(limiter);
+
+// Prevent http param pollution
+app.use(hpp());
+
+// Enable CORS
+app.use(cors());
+
 // Set static folder
 app.use(express.static(path.join(__dirname, "..", "public")));
 
@@ -44,7 +72,7 @@ app.use("/api/v1/reviews", reviewRouter);
 app.use(errorHandler);
 
 // Creating email manager
-export const eManager = new EmailManager();
+export const eManager: EmailManager = new EmailManager();
 
 try {
     console.log("Preparing database connection.");

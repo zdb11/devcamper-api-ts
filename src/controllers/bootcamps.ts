@@ -49,15 +49,16 @@ export const createBootcamp = asyncHandler(async (req: Request, res: Response, n
 // @route       PUT /api/v1/bootcamps/:id
 // @access      Private
 export const updateBootcamp = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    let bootcamp = await BootcampModel.findById(req.params.id, req.body);
+    let bootcamp = await BootcampModel.findById(req.params.id);
     if (!bootcamp) {
         return next(new ErrorResponse(`Bootcamp not found with id of ${req.params.id}`, 404));
     }
 
     // Make sure user is bootcamp owner
-    if (bootcamp.user?._id.toString() !== req.user?._id.toString() && req.user?.role !== "admin") {
+    if (bootcamp.user?.toString() !== req.user?._id.toString() && req.user?.role !== "admin") {
         return next(new ErrorResponse(`User '${req.user?._id}' is not authorized to update this bootcamp`, 401));
     }
+
     bootcamp = await BootcampModel.findOneAndUpdate({ _id: req.params.id }, req.body, {
         new: true,
         runValidators: true,
@@ -75,7 +76,7 @@ export const deleteBootcamp = asyncHandler(async (req: Request, res: Response, n
     }
 
     // Make sure user is bootcamp owner
-    if (bootcamp.user?._id.toString() !== req.user?._id.toString() && req.user?.role !== "admin") {
+    if (bootcamp.user?.toString() !== req.user?._id.toString() && req.user?.role !== "admin") {
         return next(new ErrorResponse(`User '${req.user?._id}' is not authorized to delete this bootcamp`, 401));
     }
 
@@ -117,7 +118,7 @@ export const uploadBootcampUpload = asyncHandler(async (req: Request, res: Respo
         return next(new ErrorResponse(`Bootcamp not found with id of ${req.params.id}`, 404));
     }
     // Make sure user is bootcamp owner
-    if (bootcamp.user?._id.toString() !== req.user?._id.toString() && req.user?.role !== "admin") {
+    if (bootcamp.user?.toString() !== req.user?._id.toString() && req.user?.role !== "admin") {
         return next(new ErrorResponse(`User '${req.user?._id}' is not authorized to update this bootcamp`, 401));
     }
 

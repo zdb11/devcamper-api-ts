@@ -1,5 +1,5 @@
-import { AdvancedResult } from "./interfaces.ts";
-import { IUserDocument } from "../models/User.js";
+import { AdvancedResult } from "../interfaces/interfaces.ts";
+import { IUserDocument } from "../models/User.ts";
 
 declare global {
     namespace Express {
