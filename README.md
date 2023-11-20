@@ -2,24 +2,34 @@
 
 _devcamper-api project from Brad Traversy https://github.com/bradtraversy/devcamper-api but written with Typescript_
 
-# To run
+## Usage
 
--   Create .env file in root directory with these variables
+Rename "env.env" to "env" and update the values/settings to your own
 
-| variable_name | default value | available options      | description                         |
-| ------------- | ------------- | ---------------------- | ----------------------------------- |
-| NODE_ENV      | -             | development,production | deploy target enviroment            |
-| MONGO_URI     | -             | -                      | connection string uri for MongoDB   |
-| PORT          | -             | -                      | port on which express server starts |
+## Install Dependencies
 
--   Install dependencies
-
-```sh
+```
 npm install
 ```
 
--   Run application
+## Run App
 
-```sh
+```
+# Run in dev mode
+npm run dev
+
+# Run in prod mode
 npm start
+```
+
+## Database Seeder
+
+To seed the database with users, bootcamps, courses and reviews with data from the "\_data" folder, run
+
+```
+# Destroy all data
+npm run seeder -- -d
+
+# Import all data
+npm run seeder -- -i
 ```
